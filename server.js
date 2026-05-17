@@ -1,7 +1,10 @@
+// Import packages
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
 
+// Create server (useful for APIs)
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -18,10 +21,35 @@ const bookSchema = new mongoose.Schema({
   year: Number,
   available: Boolean,
 });
-
 const Book = mongoose.model('Book', bookSchema);
 
-// API endpoints
+// Admin schema & model
+const adminSchema = new mongoose.Schema({
+  username: { type: String, unique: true, required: true },
+  password: { type: String, required: true }, // hash before saving!
+});
+const Admin = mongoose.model('Admin', adminSchema);
+
+// Admin registration route
+app.post('/api/admin', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    // Check if username exists
+    const exists = await Admin.findOne({ username });
+    if (exists) {
+      return res.status(400).json({ error: "Username already exists" });
+    }
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newAdmin = new Admin({ username, password: hashedPassword });
+    await newAdmin.save();
+    res.json({ message: "Admin registered!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Book CRUD endpoints
 app.get('/api/books', async (req, res) => {
   const books = await Book.find();
   res.json(books);
