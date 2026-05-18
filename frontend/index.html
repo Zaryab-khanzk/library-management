@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Library Admin Panel</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header with notifications -->
+      <header>
+        <h1>📚 Library Management — Admin Panel</h1>
+        <div id="notification" class="notification hidden"></div>
+      </header>
+
+      <!-- Login page (shown when not authenticated) -->
+      <main id="login-page" class="login-page">
+        <div class="login-card">
+          <h2>Admin Login</h2>
+          <p>Please log in with your admin credentials (registered via backend).</p>
+          <form id="form-login" class="form">
+            <label>
+              Username
+              <input type="text" id="login-username" placeholder="admin@example.com" required />
+            </label>
+            <label>
+              Password
+              <input type="password" id="login-password" placeholder="Your password" required />
+            </label>
+            <button type="submit" class="btn primary">Login</button>
+          </form>
+          <p class="footer-note">Admin registration is handled via the backend API only.</p>
+        </div>
+      </main>
+
+      <!-- Dashboard (shown after login) -->
+      <main id="dashboard" class="dashboard hidden">
+        <!-- Top bar with admin info and logout -->
+        <div class="dashboard-header">
+          <div>
+            <h2>Book Management Dashboard</h2>
+            <span id="admin-info" class="admin-info">Admin: </span>
+          </div>
+          <button id="btn-logout" class="btn logout-btn">Logout</button>
+        </div>
+
+        <!-- Notification area -->
+        <div id="notification-dashboard" class="notification hidden"></div>
+
+        <!-- Add/Edit Book Panel (hidden by default) -->
+        <div id="add-edit-panel" class="card hidden">
+          <div class="modal-content">
+            <h3 id="add-edit-title">Add New Book</h3>
+            <form id="form-book" class="form-inline">
+              <label>
+                Title
+                <input id="book-title" type="text" placeholder="Book title" required />
+              </label>
+              <label>
+                Author
+                <input id="book-author" type="text" placeholder="Author name" required />
+              </label>
+              <label>
+                Year
+                <input id="book-year" type="number" min="0" placeholder="Publication year" />
+              </label>
+              <label>
+                Available
+                <select id="book-available">
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+              </label>
+              <input type="hidden" id="book-id" />
+              <div class="form-actions">
+                <button type="submit" class="btn primary">Save Book</button>
+                <button type="button" id="btn-cancel" class="btn">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Books Table Section -->
+        <div class="card">
+          <div class="table-header">
+            <h3>Books List</h3>
+            <button id="btn-show-add" class="btn primary">+ Add New Book</button>
+          </div>
+          <table id="books-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Year</th>
+                <th>Available</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <p id="no-books-msg" class="no-data">No books found. Add your first book!</p>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer>
+        <small>
+          Static frontend demo. API endpoints for login, fetch books, add, edit, and delete are
+          marked in <code>app.js</code>.
+        </small>
+      </footer>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
