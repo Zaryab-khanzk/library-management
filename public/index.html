@@ -8,13 +8,14 @@
   </head>
   <body>
     <div class="container">
-      <!-- Header with notifications -->
+
+      <!-- Header with notification -->
       <header>
         <h1>📚 Library Management — Admin Panel</h1>
         <div id="notification" class="notification hidden"></div>
       </header>
 
-      <!-- Login page (shown when not authenticated) -->
+      <!-- Login page (when NOT logged in) -->
       <main id="login-page" class="login-page">
         <div class="login-card">
           <h2>Admin Login</h2>
@@ -22,7 +23,7 @@
           <form id="form-login" class="form">
             <label>
               Username
-              <input type="text" id="login-username" placeholder="admin@example.com" required />
+              <input type="text" id="login-username" placeholder="admin" required />
             </label>
             <label>
               Password
@@ -30,11 +31,11 @@
             </label>
             <button type="submit" class="btn primary">Login</button>
           </form>
-          <p class="footer-note">Admin registration is handled via the backend API only.</p>
+          <p class="footer-note">Admin registration can only be done via Postman (backend).</p>
         </div>
       </main>
 
-      <!-- Dashboard (shown after login) -->
+      <!-- Dashboard (when logged in) -->
       <main id="dashboard" class="dashboard hidden">
         <!-- Top bar with admin info and logout -->
         <div class="dashboard-header">
@@ -45,14 +46,15 @@
           <button id="btn-logout" class="btn logout-btn">Logout</button>
         </div>
 
-        <!-- Notification area -->
+        <!-- Dashboard notification area -->
         <div id="notification-dashboard" class="notification hidden"></div>
 
-        <!-- Add/Edit Book Panel (hidden by default) -->
+        <!-- Add/Edit Book Panel Modal -->
         <div id="add-edit-panel" class="card hidden">
           <div class="modal-content">
             <h3 id="add-edit-title">Add New Book</h3>
             <form id="form-book" class="form-inline">
+              <input type="hidden" id="book-id" />
               <label>
                 Title
                 <input id="book-title" type="text" placeholder="Book title" required />
@@ -72,19 +74,18 @@
                   <option value="false">No</option>
                 </select>
               </label>
-              <input type="hidden" id="book-id" />
               <div class="form-actions">
-                <button type="submit" class="btn primary">Save Book</button>
+                <button type="submit" class="btn primary">Save</button>
                 <button type="button" id="btn-cancel" class="btn">Cancel</button>
               </div>
             </form>
           </div>
         </div>
 
-        <!-- Books Table Section -->
+        <!-- Book Table Section -->
         <div class="card">
           <div class="table-header">
-            <h3>Books List</h3>
+            <h3 style="margin:0">Books List</h3>
             <button id="btn-show-add" class="btn primary">+ Add New Book</button>
           </div>
           <table id="books-table">
@@ -99,19 +100,19 @@
             </thead>
             <tbody></tbody>
           </table>
-          <p id="no-books-msg" class="no-data">No books found. Add your first book!</p>
+          <p id="no-books-msg" class="no-data hidden">No books found. Add your first book!</p>
         </div>
       </main>
 
       <!-- Footer -->
       <footer>
         <small>
-          Static frontend demo. API endpoints for login, fetch books, add, edit, and delete are
-          marked in <code>app.js</code>.
+          Built for demo; API endpoints for login, fetch, add, edit, and delete are
+          used from <code>app.js</code>.
         </small>
       </footer>
-    </div>
 
+    </div>
     <script src="app.js"></script>
   </body>
 </html>
