@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Library — User Portal</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>📚 Library — User Portal</h1>
+        <div id="notification" class="notification hidden"></div>
+      </header>
+
+      <main id="user-login-page" class="card">
+        <div class="form-column">
+          <h2>User Login</h2>
+          <form id="form-user-login" class="form">
+            <label>Username<input id="user-login-username" required /></label>
+            <label>Password<input id="user-login-password" type="password" required /></label>
+            <button class="btn primary" type="submit">Login</button>
+          </form>
+        </div>
+        <div class="form-column">
+          <h2>Register</h2>
+          <form id="form-user-register" class="form">
+            <label>Name<input id="user-register-name" /></label>
+            <label>Username<input id="user-register-username" required /></label>
+            <label>Password<input id="user-register-password" type="password" required /></label>
+            <button class="btn" type="submit">Register</button>
+          </form>
+        </div>
+      </main>
+
+      <main id="user-portal" class="hidden">
+        <div class="portal-header">
+          <div>
+            <h2>Available Books</h2>
+            <div id="user-info"></div>
+          </div>
+          <div>
+            <button id="btn-user-logout" class="btn">Logout</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <table id="books-table">
+            <thead>
+              <tr><th>Title</th><th>Author</th><th>Year</th><th>Available</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <p id="no-books-msg" class="no-data hidden">No books found.</p>
+        </div>
+
+        <div class="card">
+          <h3>Your Borrowed Books</h3>
+          <ul id="borrowed-list"></ul>
+        </div>
+      </main>
+
+      <footer>
+        <small>Use this portal to register, login, view books and borrow/return.</small>
+      </footer>
+    </div>
+    <script src="user.js"></script>
+  </body>
+</html>

@@ -31,6 +31,21 @@ const adminSchema = new mongoose.Schema({
 });
 const Admin = mongoose.model('Admin', adminSchema);
 
+// User schema & model (with embedded borrow documents referencing `Book`)
+const userSchema = new mongoose.Schema({
+  username: { type: String, unique: true, required: true },
+  password: { type: String, required: true },
+  name: String,
+  borrowed: [{
+    book: { type: mongoose.Schema.Types.ObjectId, ref: 'Book' },
+    borrowDate: Date,
+    dueDate: Date,
+    returned: { type: Boolean, default: false },
+    returnDate: Date
+  }]
+});
+const User = mongoose.model('User', userSchema);
+
 // Admin registration (POSTMAN ONLY, not in frontend)
 app.post('/api/admin', async (req, res) => {
   try {
@@ -58,6 +73,107 @@ app.post('/api/admin/login', async (req, res) => {
     if (!valid) return res.status(400).json({ error: "Invalid credentials" });
     // Simple text response (no token/session)
     res.json({ message: "Login successful" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// User registration
+app.post('/api/users', async (req, res) => {
+  try {
+    const { username, password, name } = req.body;
+    const exists = await User.findOne({ username });
+    if (exists) {
+      return res.status(400).json({ error: "Username already exists" });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, password: hashedPassword, name });
+    await newUser.save();
+    res.json({ message: "User registered!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// User login
+app.post('/api/users/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    if (!user) return res.status(400).json({ error: "Invalid credentials" });
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(400).json({ error: "Invalid credentials" });
+    res.json({ message: "Login successful", user: { id: user._id, username: user.username, name: user.name } });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get user (with borrowed books populated)
+app.get('/api/users/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).populate('borrowed.book');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Borrow a book (embed a borrow doc in the User, reference the Book)
+app.post('/api/users/:id/borrow', async (req, res) => {
+  try {
+    const { bookId } = req.body;
+    const user = await User.findById(req.params.id);
+    const book = await Book.findById(bookId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!book) return res.status(404).json({ error: 'Book not found' });
+    if (!book.available) return res.status(400).json({ error: 'Book not available' });
+    // mark book unavailable
+    book.available = false;
+    await book.save();
+    // add borrow entry to user (embedded) referencing the book
+    user.borrowed.push({
+      book: book._id,
+      borrowDate: new Date(),
+      dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      returned: false
+    });
+    await user.save();
+    const populated = await User.findById(user._id).populate('borrowed.book');
+    res.json(populated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Return a borrowed book
+app.post('/api/users/:id/return', async (req, res) => {
+  try {
+    const { bookId } = req.body;
+    const user = await User.findById(req.params.id);
+    const book = await Book.findById(bookId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!book) return res.status(404).json({ error: 'Book not found' });
+    const entry = user.borrowed.find(b => String(b.book) === String(book._id) && !b.returned);
+    if (!entry) return res.status(400).json({ error: 'No active borrow found for this book' });
+    entry.returned = true;
+    entry.returnDate = new Date();
+    book.available = true;
+    await book.save();
+    await user.save();
+    res.json({ message: 'Book returned' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Debug endpoint (development only): list admins
+// Remove this in production. Helps verify stored usernames during troubleshooting.
+app.get('/api/debug/admins', async (req, res) => {
+  try {
+    const admins = await Admin.find({}, 'username');
+    res.json(admins);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
